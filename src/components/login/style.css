@@ -1,0 +1,22 @@
+.Login {
+	align-items: center;
+	display: flex;
+	justify-content: center;
+	height: 100%;
+	width: 100%;
+}
+
+.Login .container {
+	border: 3px solid #f1f1f1;
+	box-sizing: border-box;
+	padding: 16px;
+}
+
+input[type=text] {
+	border: 1px solid #ccc;
+	box-sizing: border-box;
+	display: inline-block;
+	margin: 8px 0;
+	padding: 12px 20px;
+	width: 100%;
+}
