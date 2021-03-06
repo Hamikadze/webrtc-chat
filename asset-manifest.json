@@ -1,8 +1,8 @@
 {
   "files": {
     "main.css": "/webrtc-chat/static/css/main.35d14e9b.chunk.css",
-    "main.js": "/webrtc-chat/static/js/main.7dda5761.chunk.js",
-    "main.js.map": "/webrtc-chat/static/js/main.7dda5761.chunk.js.map",
+    "main.js": "/webrtc-chat/static/js/main.c1e039c3.chunk.js",
+    "main.js.map": "/webrtc-chat/static/js/main.c1e039c3.chunk.js.map",
     "runtime-main.js": "/webrtc-chat/static/js/runtime-main.a5c22f7a.js",
     "runtime-main.js.map": "/webrtc-chat/static/js/runtime-main.a5c22f7a.js.map",
     "static/js/2.7e16f93b.chunk.js": "/webrtc-chat/static/js/2.7e16f93b.chunk.js",
@@ -19,6 +19,6 @@
     "static/js/runtime-main.a5c22f7a.js",
     "static/js/2.7e16f93b.chunk.js",
     "static/css/main.35d14e9b.chunk.css",
-    "static/js/main.7dda5761.chunk.js"
+    "static/js/main.c1e039c3.chunk.js"
   ]
 }
