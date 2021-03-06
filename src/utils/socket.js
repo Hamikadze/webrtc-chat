@@ -4,7 +4,7 @@ import {user_instance} from "../storage/user";
 import {chatHistory_instance} from "../components/chat/chatHistory/store";
 import EventListenerClass from "./eventListenerClass";
 
-const ENDPOINT = "http://localhost:4001";
+const ENDPOINT = "https://webrtc-chat-api.herokuapp.com:4001";
 
 
 class socket extends EventListenerClass {

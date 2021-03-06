@@ -11,13 +11,18 @@ class webRTC extends EventListenerClass {
         this._connectionsCount = 0;
         this.peers = {};
         this.server = {
-            iceServers: [
-                {urls: 'stun:stun.l.google.com:19302'},
-                {urls: 'stun:stun1.l.google.com:19302'},
-                {urls: 'stun:stun2.l.google.com:19302'},
-                {urls: 'stun:stun3.l.google.com:19302'},
-                {urls: 'stun:stun4.l.google.com:19302'},
-            ],
+            iceServers: [{
+                url: "turn:217.150.77.131:3478",
+                username: "turnclient",
+                credential: "$0mep@$$w0rd"
+            },
+                {url: "stun:217.150.77.131:3478"},
+                {url: 'stun:stun.l.google.com:19302'},
+                {url: 'stun:stun1.l.google.com:19302'},
+                {url: 'stun:stun2.l.google.com:19302'},
+                {url: 'stun:stun3.l.google.com:19302'},
+                {url: 'stun:stun4.l.google.com:19302'},
+            ]
         };
         console.log('webRTC created!');
     }

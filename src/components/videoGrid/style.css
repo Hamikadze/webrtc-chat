@@ -32,7 +32,7 @@
 
 .selected-video{
 	border-radius: 5px;
-	height: 50vh;
+	height: 50vmin;
 	width: auto;
 }
 
