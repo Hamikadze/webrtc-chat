@@ -12,16 +12,16 @@ class webRTC extends EventListenerClass {
         this.peers = {};
         this.server = {
             iceServers: [{
-                url: "turn:217.150.77.131:3478",
-                username: "turnclient",
-                credential: "$0mep@$$w0rd"
+                url: 'turn:217.150.77.131:3478',
+                username: 'turnclient',
+                credential: '$0mep@$$w0rd'
             },
-                {url: "stun:217.150.77.131:3478"},
+                {url: 'turn:webrtc-chat-api.herokuapp.com:3478'},
+                {url: 'stun:webrtc-chat-api.herokuapp.com'},
+                {url: 'stun:stun.l.google.com:19302'},
+                {url: 'stun:217.150.77.131:3478'},
                 {url: 'stun:stun.l.google.com:19302'},
                 {url: 'stun:stun1.l.google.com:19302'},
-                {url: 'stun:stun2.l.google.com:19302'},
-                {url: 'stun:stun3.l.google.com:19302'},
-                {url: 'stun:stun4.l.google.com:19302'},
             ]
         };
         console.log('webRTC created!');
@@ -191,6 +191,7 @@ async function initMedia(id, pc) {
         localVideo.srcObject = user_instance.localStream;
     }
     user_instance.localStream.getTracks().forEach(track => {
+        pc.track
         pc.addTrack(track, user_instance.localStream);
     });
 }

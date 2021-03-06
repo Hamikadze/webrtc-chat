@@ -32,7 +32,7 @@ export default function VideoGrid() {
                       type={'local'}/>
             {
                 usersList.filter(user => user.id !== user_instance.user.id).map(user =>
-                    <VideoBox title={user.name}
+                    <VideoBox key={`video-${user.id}`} title={user.name}
                               videoId={user.id} onClick={handleClick}
                               type={'remote'}/>
                 )
