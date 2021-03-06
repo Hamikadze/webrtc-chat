@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState,} from "react";
 import './style.css'
-import {sendNewMessage} from "../../../utils/socket";
+import {socket_instance} from "../../../utils/socket";
 
 export default function AutoTextArea() {
     const textAreaRef = useRef(null);
@@ -14,34 +14,30 @@ export default function AutoTextArea() {
     const onChangeHandler = function (event) {
         setTextAreaHeight("auto");
         setText(event.target.value);
+        console.log(text.split('\r\n'));
     };
 
+    const onKeyDown = function (event) {
+        if (!event.shiftKey && event.keyCode === 13) {
+            sendMessage();
+            event.preventDefault();
+        }
+    }
 
     const sendMessage = function () {
         const msg = text.trim();
         if (msg.length === 0)
             return;
-        console.log(msg);
-        sendNewMessage(msg);
-
-        /*for (let id in webRTC_instance.peers) {
-            if (webRTC_instance.peers.hasOwnProperty(id)) {
-                if (webRTC_instance.peers[id].channel !== undefined) {
-                    try {
-                        webRTC_instance.peers[id].channel.send(msg);
-                    } catch (e) {
-                    }
-                }
-            }
-        }*/
+        socket_instance.sendNewMessage(msg);
 
         setText('');
+        setTextAreaHeight("auto");
     }
 
     return (
         <div className={'AutoTextArea'}>
-            <div className={'container'}  >
-			<textarea className={'auto-textArea'}
+            <div className={'text-area-container'}>
+			<textarea className={'auto-text-area'}
                       ref={textAreaRef}
                       rows={1}
                       style={{
@@ -50,8 +46,9 @@ export default function AutoTextArea() {
                       }}
                       value={text}
                       onChange={onChangeHandler}
+                      onKeyDown={onKeyDown}
             />
-                <button className={'send-button'} onClick={sendMessage}>Send</button>
+                <button onClick={sendMessage}>Send</button>
             </div>
         </div>
     );

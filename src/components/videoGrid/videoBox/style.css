@@ -1,0 +1,48 @@
+/* hover styles */
+.video-listing {
+	position: relative;
+	box-sizing: border-box;
+	margin: 5px 5px;
+}
+
+.video-container {
+	line-height: 0;
+	overflow: hidden;
+	box-sizing: border-box;
+	border-radius: 5px;
+}
+
+.video-container > video {
+	height: 20vh;
+	width: auto;
+	filter: blur(0px);
+	transition: filter 0.3s ease-in;
+}
+
+.video-title {
+	font-size: 1.5em;
+	font-weight: bold;
+	text-decoration: none;
+	z-index: 1;
+	position: absolute;
+	height: 20vh;
+	width: 100%;
+	top: 0;
+	left: 0;
+	opacity: 0;
+	transition: opacity .5s;
+	background: rgba(90,0,10,0.4);
+	color: white;
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.video-listing:hover > .video-title {
+	opacity: 1;
+}
+
+.video-listing:hover > .video-title video {
+	filter: blur(2px);
+}

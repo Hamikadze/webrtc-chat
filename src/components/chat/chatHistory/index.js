@@ -12,26 +12,25 @@ export default function ChatHistory() {
         };
     }, []);
     const onMessage = (event) => {
-        console.log(event);
         setMessages(v => [...v, event]);
     }
+
+    const formatTime = (time) => `${('0' + time.getHours()).substr(-2)}:${('0' + time.getMinutes()).substr(-2)}`
+
     return <div className={'ChatHistory'}>
-        <div className={'container'}>
-            <div className={"chat-log"}>
-                {messages.map(value =>
-                    <>
-                        <div className={'container'}>
+        <div className={'chat-history-container'}>
+            {messages.map((data, i) =>
+                <div key={i}>
+                    <div className={'info-container'}>
 
-                            <div className={'user'}>{`${value.id}`}</div>
-                            <div className={'time'}>
-                                {`${('0' + value.time.getHours()).substr(-2)}:${('0' + value.time.getMinutes()).substr(-2)}`}
-                            </div>
+                        <div className={'user'}>{`${data.user}`}</div>
+                        <div className={'time'}>
+                            {formatTime(data.data.time)}
                         </div>
-                        <span className={'message'}>{`${value.data}`}</span>
-                    </>
-                )}
-
-            </div>
+                    </div>
+                    <span style={{whiteSpace: 'pre-line'}} className={'message'}>{`${data.data.text}`}</span>
+                </div>
+            )}
         </div>
     </div>
 }

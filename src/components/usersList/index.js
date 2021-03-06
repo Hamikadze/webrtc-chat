@@ -1,14 +1,33 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import './style.css';
+import {socket_instance} from "../../utils/socket";
 
 export default function UserList() {
+    const [usersList, setUsersList] = useState([]);
 
+    useEffect(() => {
+        socket_instance.addEventListener('usersChange', onUsersChange);
+        return () => {
+            socket_instance.removeEventListener('usersChange', onUsersChange);
+        };
+    }, []);
 
-    return <div className={'Login'}>
-        <div className={'container'}>
-            <label htmlFor="uname"><b>Username</b></label>
-            <input type="text" placeholder="Enter Username" onChange={handlerOnUsernameInput} required/>
-            <button type="submit" onClick={handlerOnClick}>Login</button>
+    const onUsersChange = (data) => {
+        setUsersList([...data]);
+    }
+
+    return <div className={'UsersList'}>
+        <div className={'users-list-container'}>
+            <ol className={"users-list"}>
+                {usersList.map(value =>
+                    <li key={value.id} className={'list-item'}>
+                        <div className={'user-item-gradient'}/>
+                        <div className={'user-item-content'}>
+                            <h4>{`${value.name}`}</h4>
+                        </div>
+                    </li>
+                )}
+            </ol>
         </div>
     </div>
 }

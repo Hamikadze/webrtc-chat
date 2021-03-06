@@ -1,18 +1,25 @@
-import {sendRTCOverSocket} from "./socket";
-import {chatHistory_instance} from "../components/chat/chatHistory/store";
+import {socket_instance} from "./socket";
+import EventListenerClass from "./eventListenerClass";
+import {user_instance} from "../storage/user";
 
 
-class webRTC {
-
+class webRTC extends EventListenerClass {
     constructor() {
+        super();
+        this._streams = {};
         this._eventListeners = {};
         this._connectionsCount = 0;
         this.peers = {};
         this.server = {
             iceServers: [
-                {url: "stun:stun.l.google.com:19302"},
-            ]
+                {urls: 'stun:stun.l.google.com:19302'},
+                {urls: 'stun:stun1.l.google.com:19302'},
+                {urls: 'stun:stun2.l.google.com:19302'},
+                {urls: 'stun:stun3.l.google.com:19302'},
+                {urls: 'stun:stun4.l.google.com:19302'},
+            ],
         };
+        console.log('webRTC created!');
     }
 
     get connectionsCount() {
@@ -30,25 +37,56 @@ class webRTC {
         });
     }
 
-    addEventListener(type, handler) {
-        if (this._eventListeners[type] === undefined)
-            this._eventListeners[type] = [];
-        this._eventListeners[type].push(handler);
+    addStream(id, stream) {
+        this._streams[id] = stream;
+        this._eventListeners[`streamAdded-${id}`]?.forEach(i => {
+            if (this._streams[id] !== undefined)
+                i(this._streams[id])
+        });
     }
 
-    removeEventListener(type, handler) {
-        this._eventListeners[type] = this._eventListeners[type]
-            .filter(i => i.toString() !== handler.toString());
+    getStream(id) {
+        return this._streams[id];
+    }
+
+    onBeforeUnload = () => {
+        for (let id in webRTC_instance.peers) {
+            if (webRTC_instance.peers.hasOwnProperty(id)) {
+                if (webRTC_instance.peers[id].channel !== undefined) {
+                    try {
+                        webRTC_instance.peers[id].channel.close();
+                    } catch (e) {
+                        console.error(e);
+                    }
+                }
+            }
+        }
     }
 }
 
 export const webRTC_instance = new webRTC();
 
 
+export async function webRTC_newPeer({user, data}) {
+    if (user !== 'SERVER')
+        return;
+
+    console.log('Creating new peer', [user, data]);
+    createConnection(data.id);
+    const pc = webRTC_instance.peers[data.id].connection;
+
+    await initMedia(data.id, pc);
+    await pc.createOffer().then(offer => {
+        return pc.setLocalDescription(offer)
+            .catch(error => console.error('Error set local description', error));
+    }).catch(error => console.error('Error create offer', error));
+    initConnection(data.id, "offer", pc);
+
+}
+
 export function socketReceived(data) {
     const json = JSON.parse(data);
-    console.log(`socketReceived:`);
-    console.log(json);
+    console.log('socketReceived:', json);
     switch (json.type) {
         case "candidate":
             remoteCandidateReceived(json.id, json.data);
@@ -66,106 +104,90 @@ export function socketReceived(data) {
     }
 }
 
-export function remoteAnswerReceived(id, data) {
-    console.log(`Setting remote answer from ${id}`);
-    console.log(data);
+export async function remoteAnswerReceived(id, answer) {
+    console.log('Remote answer received', [id, answer]);
+
     const pc = webRTC_instance.peers[id].connection;
-    pc.setRemoteDescription(new RTCSessionDescription(data)).catch(error => {
-        console.error('Set remote description failed: ', error)
-    });
+    await pc.setRemoteDescription(answer).catch(error => console.error('Error set remote description', error));
 }
 
-export function remoteCandidateReceived(id, data) {
+export async function remoteCandidateReceived(id, candidate) {
+    console.log('Remote offer received', [id, candidate])
+
     createConnection(id);
     const pc = webRTC_instance.peers[id].connection;
-    pc.addIceCandidate(new RTCIceCandidate(data)).catch(error => {
-        console.error('Add ice candidate failed: ', error)
-    });
+    await pc.addIceCandidate(candidate).catch(error => console.error('Error add iceCandidate', error));
 }
 
-export function remoteOfferReceived(id, data) {
+export async function remoteOfferReceived(id, offer) {
+    console.log('Remote offer received', [id, offer]);
+
     createConnection(id);
     const pc = webRTC_instance.peers[id].connection;
+    await initMedia(id, pc)
+    await pc.setRemoteDescription(offer).then(() => {
+        pc.createAnswer().then(answer => {
+            return pc.setLocalDescription(answer)
+                .catch(error => console.error('Error set local description', error));
+        }).catch(error => console.error('Error create answer', error));
+    }).catch(error => console.error('Error set remote description', error));
 
-    pc.setRemoteDescription(new RTCSessionDescription(data)).catch(error => {
-        console.error('Set remote description failed: ', error)
-    });
-    pc.createAnswer().then(answer => {
-        pc.setLocalDescription(answer).catch(error => {
-            console.error('Set local description failed: ', error)
-        });
-    }).catch(error => {
-        console.error('Send answer failed: ', error)
-    });
+    initConnection(id, "answer", pc);
+
 }
 
-export function socketNewPeer(id) {
-    console.log(`socketNewPeer ${id}`);
-    webRTC_instance.peers[id] = {
-        candidateCache: []
-    };
-
-    // Создаем новое подключение
-    const pc = new RTCPeerConnection(webRTC_instance.server/*, options*/);
-    // Инициализирууем его
-    initConnection(pc, id, "offer");
-
-    // Сохраняем пира в списке пиров
-    webRTC_instance.peers[id].connection = pc;
-
-    // Создаем DataChannel по которому и будет происходить обмен сообщениями
-    const channel = pc.createDataChannel("mychannel", {});
-    channel.owner = id;
-    webRTC_instance.peers[id].channel = channel;
-
-    // Устанавливаем обработчики событий канала
-    bindEvents(channel);
-
-    // Создаем SDP offer
-    pc.createOffer().then(offer => {
-        pc.setLocalDescription(offer).catch(error => {
-            console.error('Set local description failed: ', error)
-        });
-    }).catch(error => {
-        console.error('Send offer failed: ', error)
-    });
-}
-
-export function onBeforeUnload(e) {
-    for (let id in webRTC_instance.peers) {
-        if (webRTC_instance.peers.hasOwnProperty(id)) {
-            if (webRTC_instance.peers[id].channel !== undefined) {
-                try {
-                    webRTC_instance.peers[id].channel.close();
-                } catch (e) {
-                }
-            }
-        }
-    }
-}
-
-function initConnection(pc, id, sdpType) {
+function initConnection(id, sdpType, pc) {
     pc.onicecandidate = function (event) {
         if (event.candidate) {
-            // При обнаружении нового ICE кандидата добавляем его в список для дальнейшей отправки
             webRTC_instance.peers[id].candidateCache.push(event.candidate);
         } else {
-            // Когда обнаружение кандидатов завершено, обработчик будет вызван еще раз, но без кандидата
-            // В этом случае мы отправялем пиру сначала SDP offer или SDP answer (в зависимости от параметра функции)...
-            sendRTCOverSocket(sdpType, pc.localDescription, id);
-            // ...а затем все найденные ранее ICE кандидаты
+            socket_instance.sendRTCOverSocket(id, sdpType, pc.localDescription);
             for (let i = 0; i < webRTC_instance.peers[id].candidateCache.length; i++) {
-                sendRTCOverSocket("candidate", webRTC_instance.peers[id].candidateCache[i], id);
+                socket_instance.sendRTCOverSocket(id, "candidate", webRTC_instance.peers[id].candidateCache[i]);
             }
         }
     }
     pc.oniceconnectionstatechange = function (event) {
-        if (pc.iceConnectionState === "disconnected") {
-            delete webRTC_instance.peers[id];
-            webRTC_instance.connectionsCount = webRTC_instance.connectionsCount - 1;
-            console.log(`[${id}] disconnected! Peers: ${webRTC_instance.connectionsCount}`);
+        switch (pc.iceConnectionState) {
+            case 'disconnected': {
+                delete webRTC_instance.peers[id];
+                webRTC_instance.connectionsCount = webRTC_instance.connectionsCount - 1;
+                console.log(`[${id}] disconnected! Peers: ${webRTC_instance.connectionsCount}`);
+                break;
+            }
+            case 'connected': {
+                webRTC_instance.connectionsCount = webRTC_instance.connectionsCount + 1;
+                console.log(`[${id}] connected! Peers: ${webRTC_instance.connectionsCount}`);
+                break;
+            }
+            default:
+                console.log(pc.iceConnectionState);
+                break;
         }
     }
+    pc.onnegotiationneeded = async function (event) {
+        if (pc.signalingState !== "stable") return;
+        pc.createOffer().then(offer => {
+            pc.setLocalDescription(offer).then(() => {
+                socket_instance.sendRTCOverSocket(id, sdpType, pc.localDescription);
+            }).catch(error => console.error('Error set local description', error));
+        }).catch(error => console.error('Error create offer', error));
+    }
+}
+
+async function initMedia(id, pc) {
+
+    pc.ontrack = function ({streams: [stream]}) {
+        webRTC_instance.addStream(id, stream);
+    }
+
+    const localVideo = document.getElementById(`video-${user_instance.user.id}`);
+    if (localVideo) {
+        localVideo.srcObject = user_instance.localStream;
+    }
+    user_instance.localStream.getTracks().forEach(track => {
+        pc.addTrack(track, user_instance.localStream);
+    });
 }
 
 function createConnection(id) {
@@ -173,25 +195,7 @@ function createConnection(id) {
         webRTC_instance.peers[id] = {
             candidateCache: []
         };
-        const pc = new RTCPeerConnection(webRTC_instance.server/*, options*/);
-        initConnection(pc, id, "answer");
-
-        webRTC_instance.peers[id].connection = pc;
-        pc.ondatachannel = function (e) {
-            webRTC_instance.peers[id].channel = e.channel;
-            webRTC_instance.peers[id].channel.owner = id;
-            bindEvents(webRTC_instance.peers[id].channel);
-        }
+        webRTC_instance.peers[id].connection =
+            new RTCPeerConnection(/*webRTC_instance.server, options*/);
     }
-}
-
-function bindEvents(channel) {
-    channel.onopen = function () {
-        webRTC_instance.connectionsCount = webRTC_instance.connectionsCount + 1;
-        console.log(`New peer connected! Peers: ${webRTC_instance.connectionsCount}`);
-    };
-
-    channel.onmessage = function (e) {
-        chatHistory_instance.push(e.data);
-    };
 }

@@ -1,27 +1,30 @@
-.ChatHistory .container {
-	border-radius: 5px;
+.ChatHistory{
+	height: 100%;
+	max-width: 100%;
+	overflow-y: auto;
+	margin: 5px;
 }
 
-.chat-log .container {
+.chat-history-container {
+	height: 100px;
+	min-height: 100%;
+	width: 100%;
+	overflow-y: auto;
+}
+
+.info-container {
 	display: flex;
 	flex-direction: row;
 	margin-top: 10px;
 }
 
-.chat-log :first-child {
-	margin-top: 0px;
-}
 
-.chat-log .container .user {
+.info-container > .user {
 	color: dodgerblue;
 	font-weight: bold;
 }
 
-.chat-log .container .time {
+.info-container > .time {
 	color: gray;
 	margin-left: 5px;
-}
-
-.chat-log .message {
-	white-space: pre-line;
 }

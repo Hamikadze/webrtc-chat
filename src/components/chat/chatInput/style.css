@@ -1,19 +1,25 @@
-.AutoTextArea .container {
+.AutoTextArea{
+	max-width: 100%;
+	margin: 5px;
+}
+
+.text-area-container {
 	display: flex;
 	flex-direction: row;
 	height: auto;
 }
 
-.send-button {
+.text-area-container > button {
 	align-self: flex-end;
 	width: auto;
 }
 
-.auto-textArea {
+.auto-text-area {
+	margin-right: 5px;
 	height: 100%;
 	resize: none;
 }
 
-.auto-textArea:focus {
+.auto-text-area:focus {
 	outline: none;
 }
