@@ -192,7 +192,6 @@ async function initMedia(id, pc) {
         localVideo.srcObject = user_instance.localStream;
     }
     user_instance.localStream.getTracks().forEach(track => {
-        pc.track
         pc.addTrack(track, user_instance.localStream);
     });
 }
