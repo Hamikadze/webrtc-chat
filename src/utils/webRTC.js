@@ -11,14 +11,15 @@ class webRTC extends EventListenerClass {
         this._connectionsCount = 0;
         this.peers = {};
         this.server = {
-            iceServers: [{
-                url: 'turn:217.150.77.131:3478',
-                username: 'turnclient',
-                credential: '$0mep@$$w0rd'
-            },
+            iceServers: [
                 {url: 'turn:webrtc-chat-api.herokuapp.com:3478'},
                 {url: 'stun:webrtc-chat-api.herokuapp.com'},
                 {url: 'stun:stun.l.google.com:19302'},
+                {
+                    url: 'turn:217.150.77.131:3478',
+                    username: 'turnclient',
+                    credential: '$0mep@$$w0rd'
+                },
                 {url: 'stun:217.150.77.131:3478'},
                 {url: 'stun:stun.l.google.com:19302'},
                 {url: 'stun:stun1.l.google.com:19302'},
