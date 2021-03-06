@@ -12,15 +12,19 @@ class webRTC extends EventListenerClass {
         this.peers = {};
         this.server = {
             iceServers: [
-                {url: 'turn:webrtc-chat-api.herokuapp.com:3478'},
-                {url: 'stun:webrtc-chat-api.herokuapp.com'},
-                {url: 'stun:stun.l.google.com:19302'},
                 {
                     url: 'turn:217.150.77.131:3478',
                     username: 'turnclient',
                     credential: '$0mep@$$w0rd'
                 },
                 {url: 'stun:217.150.77.131:3478'},
+                {
+                    url: 'turn:webrtc-chat-api.herokuapp.com:3478',
+                    username: 'turnclient',
+                    credential: '$0mep@$$w0rd'
+                },
+                {url: 'stun:webrtc-chat-api.herokuapp.com'},
+                {url: 'stun:stun.l.google.com:19302'},
                 {url: 'stun:stun.l.google.com:19302'},
                 {url: 'stun:stun1.l.google.com:19302'},
             ]
@@ -192,7 +196,8 @@ async function initMedia(id, pc) {
 
 function createConnection(id) {
     if (webRTC_instance.peers[id] === undefined) {
+        webRTC_instance.peers[id] = {};
         webRTC_instance.peers[id].connection =
-            new RTCPeerConnection(/*webRTC_instance.server, options*/);
+            new RTCPeerConnection(webRTC_instance.server);
     }
 }
