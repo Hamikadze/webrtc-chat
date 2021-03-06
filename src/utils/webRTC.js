@@ -87,7 +87,6 @@ export async function webRTC_newPeer({user, data}) {
             .catch(error => console.error('Error set local description', error));
     }).catch(error => console.error('Error create offer', error));
     initConnection(data.id, "offer", pc);
-
 }
 
 export function socketReceived(data) {
@@ -122,7 +121,8 @@ export async function remoteCandidateReceived(id, candidate) {
 
     createConnection(id);
     const pc = webRTC_instance.peers[id].connection;
-    await pc.addIceCandidate(candidate).catch(error => console.error('Error add iceCandidate', error));
+    await pc.addIceCandidate(candidate)
+        .catch(error => console.error('Error add iceCandidate', error));
 }
 
 export async function remoteOfferReceived(id, offer) {
@@ -130,7 +130,7 @@ export async function remoteOfferReceived(id, offer) {
 
     createConnection(id);
     const pc = webRTC_instance.peers[id].connection;
-    await initMedia(id, pc)
+    await initMedia(id, pc);
     await pc.setRemoteDescription(offer).then(() => {
         pc.createAnswer().then(answer => {
             return pc.setLocalDescription(answer)
@@ -139,20 +139,13 @@ export async function remoteOfferReceived(id, offer) {
     }).catch(error => console.error('Error set remote description', error));
 
     initConnection(id, "answer", pc);
-
 }
 
 function initConnection(id, sdpType, pc) {
     pc.onicecandidate = function (event) {
-        if (event.candidate) {
-            webRTC_instance.peers[id].candidateCache.push(event.candidate);
-        } else {
-            socket_instance.sendRTCOverSocket(id, sdpType, pc.localDescription);
-            for (let i = 0; i < webRTC_instance.peers[id].candidateCache.length; i++) {
-                socket_instance.sendRTCOverSocket(id, "candidate", webRTC_instance.peers[id].candidateCache[i]);
-            }
-        }
+        socket_instance.sendRTCOverSocket(id, "candidate", event.candidate);
     }
+
     pc.oniceconnectionstatechange = function (event) {
         switch (pc.iceConnectionState) {
             case 'disconnected': {
@@ -171,6 +164,7 @@ function initConnection(id, sdpType, pc) {
                 break;
         }
     }
+
     pc.onnegotiationneeded = async function (event) {
         if (pc.signalingState !== "stable") return;
         pc.createOffer().then(offer => {
@@ -198,9 +192,6 @@ async function initMedia(id, pc) {
 
 function createConnection(id) {
     if (webRTC_instance.peers[id] === undefined) {
-        webRTC_instance.peers[id] = {
-            candidateCache: []
-        };
         webRTC_instance.peers[id].connection =
             new RTCPeerConnection(/*webRTC_instance.server, options*/);
     }

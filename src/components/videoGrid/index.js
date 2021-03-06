@@ -17,7 +17,7 @@ export default function VideoGrid() {
     }, []);
 
     const onUsersChange = (data) => {
-        setUsersList(data);
+        setUsersList([...data]);
     }
 
     const handleClick = (event) => {
