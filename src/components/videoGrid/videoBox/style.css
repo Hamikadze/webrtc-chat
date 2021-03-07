@@ -1,20 +1,20 @@
 /* hover styles */
 .video-listing {
+	display: inline-block;
 	position: relative;
-	box-sizing: border-box;
 	margin: 5px 5px;
+	border-radius: 5px;
+	overflow: hidden;
+	height: 150px;
+	width: 200px;
 }
 
 .video-container {
-	line-height: 0;
-	overflow: hidden;
-	box-sizing: border-box;
-	border-radius: 5px;
 }
 
 .video-container > video {
-	height: 20vh;
-	width: auto;
+	width: 100%;
+	height: auto;
 	filter: blur(0px);
 	transition: filter 0.3s ease-in;
 }
@@ -25,7 +25,7 @@
 	text-decoration: none;
 	z-index: 1;
 	position: absolute;
-	height: 20vh;
+	height: 100%;
 	width: 100%;
 	top: 0;
 	left: 0;

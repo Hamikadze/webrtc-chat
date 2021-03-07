@@ -1,34 +1,35 @@
 import {socket_instance} from "./socket";
 import EventListenerClass from "./eventListenerClass";
-import {user_instance} from "../storage/user";
+import {media_instance} from "../storage/mediaStreams";
 
 class webRTC extends EventListenerClass {
     constructor() {
         super();
-        this._streams = {};
         this._eventListeners = {};
         this._connectionsCount = 0;
         this.peers = {};
         this.server = {
             iceServers: [
+                //Сервер на heroku с использованием node-turn
                 {
                     url: 'turn:webrtc-chat-api.herokuapp.com:3478',
                     username: 'turnclient',
                     credential: '$0mep@$$w0rd'
                 },
                 {url: 'stun:webrtc-chat-api.herokuapp.com'},
+                //Сервер на собственном сервере с использованием coturn
                 {
                     url: 'turn:217.150.77.131:3478',
                     username: 'turnclient',
                     credential: '$0mep@$$w0rd'
                 },
                 {url: 'stun:217.150.77.131:3478'},
+                //Google stun сервера
                 {url: 'stun:stun.l.google.com:19302'},
                 {url: 'stun:stun.l.google.com:19302'},
                 {url: 'stun:stun1.l.google.com:19302'},
             ]
         };
-        console.log('webRTC created!');
     }
 
     get connectionsCount() {
@@ -44,18 +45,6 @@ class webRTC extends EventListenerClass {
                 peers: this.peers.keys
             })
         });
-    }
-
-    addStream(id, stream) {
-        this._streams[id] = stream;
-        this._eventListeners[`streamAdded-${id}`]?.forEach(i => {
-            if (this._streams[id] !== undefined)
-                i(this._streams[id])
-        });
-    }
-
-    getStream(id) {
-        return this._streams[id];
     }
 
     onBeforeUnload = () => {
@@ -84,7 +73,7 @@ export async function webRTC_newPeer({user, data}) {
     createConnection(id);
     const pc = webRTC_instance.peers[id].connection;
 
-    initConnection(id,  pc);
+    initConnection(id, pc);
 
     await initMedia(id, pc);
     await pc.createOffer().then(offer => {
@@ -157,6 +146,7 @@ function initConnection(id, pc) {
         switch (pc.iceConnectionState) {
             case 'disconnected': {
                 delete webRTC_instance.peers[id];
+                media_instance.removeStream(id);
                 webRTC_instance.connectionsCount = webRTC_instance.connectionsCount - 1;
                 console.log(`[${id}] disconnected! Peers: ${webRTC_instance.connectionsCount}`);
                 break;
@@ -172,29 +162,28 @@ function initConnection(id, pc) {
         }
     }
 
-    /*pc.onnegotiationneeded = async function (event) {
+    /* The block is disabled until better times when I
+     finish tracking access to camera permission
+
+    pc.onnegotiationneeded = async function (event) {
         if (pc.signalingState !== "stable") return;
         pc.createOffer().then(offer => {
             pc.setLocalDescription(offer).then(() => {
                 socket_instance.sendRTCOverSocket(id, 'offer', pc.localDescription);
             }).catch(error => console.error('Error set local description', error));
         }).catch(error => console.error('Error create offer', error));
-    }*/
+    }         */
 }
 
 async function initMedia(id, pc) {
-
     pc.ontrack = function ({streams: [stream]}) {
-        webRTC_instance.addStream(id, stream);
+        media_instance.addStream(id, stream);
     }
 
-    const localVideo = document.getElementById(`video-${user_instance.user.id}`);
-    if (localVideo) {
-        localVideo.srcObject = user_instance.localStream;
-    }
-    user_instance.localStream.getTracks().forEach(track => {
-        pc.addTrack(track, user_instance.localStream);
-    });
+    if (media_instance.localStream !== undefined)
+        media_instance.localStream.getTracks().forEach(track => {
+            pc.addTrack(track, media_instance.localStream);
+        })
 }
 
 function createConnection(id) {

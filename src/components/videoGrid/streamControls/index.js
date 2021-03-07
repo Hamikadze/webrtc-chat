@@ -2,30 +2,28 @@ import React, {useState} from 'react';
 import camera_icon from './assets/camera.svg';
 import microphone_icon from './assets/microphone.svg';
 import './style.css';
-import {user_instance} from "../../../storage/user";
+import {media_instance} from "../../../storage/mediaStreams";
 
 export default function StreamControls() {
-    const [video, setVideo] = useState(user_instance.localStream.getVideoTracks()[0].enabled);
-    const [audio, setAudio] = useState(user_instance.localStream.getVideoTracks()[0].enabled);
-    const videoTrack = user_instance.localStream.getVideoTracks()[0];
-    const audioTrack = user_instance.localStream.getAudioTracks()[0];
+    const [video, setVideo] = useState(media_instance.getState(media_instance.localId, 'video').enabled);
+    const [audio, setAudio] = useState(media_instance.getState(media_instance.localId, 'audio').enabled);
 
     const toggleCamera = function () {
-        videoTrack.enabled = !videoTrack.enabled;
-        setVideo(videoTrack.enabled)
+        setVideo(media_instance.toggleStream(media_instance.localId, 'video').enabled);
     }
 
     const toggleMic = function () {
-        audioTrack.enabled = !audioTrack.enabled;
-        setAudio(audioTrack.enabled);
+        setAudio(media_instance.toggleStream(media_instance.localId, 'audio').enabled);
     }
 
     return (<div className={'StreamControls'}>
         <div className={'controls-container'}>
-            <div style={{backgroundColor: (video ? '#B1D9CD' : '#FDB196')}} className={'round-container'} onClick={toggleCamera}>
-                <img src={camera_icon} alt="camera icon" />
+            <div style={{backgroundColor: (video ? '#B1D9CD' : '#FDB196')}} className={'round-container'}
+                 onClick={toggleCamera}>
+                <img src={camera_icon} alt="camera icon"/>
             </div>
-            <div style={{backgroundColor: (audio ? '#B1D9CD' : '#FDB196')}} className={'round-container'} onClick={toggleMic}>
+            <div style={{backgroundColor: (audio ? '#B1D9CD' : '#FDB196')}} className={'round-container'}
+                 onClick={toggleMic}>
                 <img src={microphone_icon} alt="microphone icon"/>
             </div>
         </div>

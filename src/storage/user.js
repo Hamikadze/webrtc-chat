@@ -4,7 +4,6 @@ class user {
     constructor() {
         this._eventListeners = {};
         this._user = {id: '', name: '', room: this.roomId};
-        this._localStream = null;
     }
 
     get localStream() {
@@ -21,15 +20,23 @@ class user {
 
     set user(value) {
         this._user = value;
+        console.log('Logged', this._user);
     }
 
     get roomId() {
-        let room = window.location.pathname.substr(1);
-        if (!room) {
-            room = uuid();
-            window.location = room;
+        if (this._user === undefined || this._user.room === undefined) {
+            const url = new URL(window.location.href);
+            const urlParams = new URLSearchParams(url.search);
+            let room = urlParams.get('room')
+            if (!room) {
+                room = uuid();
+                urlParams.append('room', room);
+                window.location.search = urlParams;
+            }
+            return room;
+        } else {
+            return this._user.room;
         }
-        return room;
     }
 }
 

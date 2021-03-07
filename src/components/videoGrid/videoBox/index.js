@@ -1,19 +1,28 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef} from 'react';
 import './style.css';
-import {webRTC_instance} from "../../../utils/webRTC";
+import {media_instance} from "../../../storage/mediaStreams";
 
 export default function VideoBox({videoId, title, type, onClick}) {
     const videoEl = useRef(null);
     useEffect(() => {
-        webRTC_instance.addEventListener(`streamAdded-${videoId}`, handleStream);
-        if (videoEl !== null)
-            videoEl.current.srcObject = webRTC_instance.getStream(videoId);
+        media_instance.addEventListener(`streamAdded-${videoId}`, onStreamAdded);
+        media_instance.addEventListener(`streamToggled-${videoId}`, onStreamToggled);
+        if (videoEl !== null) {
+            videoEl.current.srcObject = media_instance.getStream(videoId);
+            console.log([videoId, media_instance.getStream(videoId), media_instance._streams]);
+        }
         return () => {
-            webRTC_instance.addEventListener(`streamAdded-${videoId}`, handleStream);
+            media_instance.removeEventListener(`streamAdded-${videoId}`, onStreamAdded);
+            media_instance.removeEventListener(`streamToggled-${videoId}`, onStreamToggled);
         }
     }, [])
 
-    const handleStream = function (stream) {
+    const onStreamAdded = function (stream) {
+        if (videoEl !== null)
+            videoEl.current.srcObject = stream;
+    }
+
+    const onStreamToggled = function (stream) {
         if (videoEl !== null)
             videoEl.current.srcObject = stream;
     }

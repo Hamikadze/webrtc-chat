@@ -7,20 +7,18 @@ import UserList from "./components/usersList";
 import VideoGrid from "./components/videoGrid";
 import Chat from "./components/chat";
 import {user_instance} from "./storage/user";
+import {media_instance} from "./storage/mediaStreams";
 
 function App() {
     const [logged, setLogged] = useState(false)
 
     const onLogged = (data) => {
         user_instance.user = data.data;
+        media_instance.localId = data.data.id;
         setLogged(true);
     }
 
     useEffect(() => {
-        navigator.mediaDevices.getUserMedia({video: true, audio: true})
-            .then(stream => user_instance.localStream = stream)
-            .catch(error => console.error('Error get user media', error));
-
         socket_instance.addEventListener('logged', onLogged);
         if (!logged)
             return;
