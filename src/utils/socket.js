@@ -4,7 +4,8 @@ import {user_instance} from "../storage/user";
 import {chatHistory_instance} from "../components/chat/chatHistory/store";
 import EventListenerClass from "./eventListenerClass";
 
-const ENDPOINT = "https://webrtc-chat-api.herokuapp.com";
+const ENDPOINT = (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') ?
+    'http://localhost:4001' : 'https://webrtc-chat-api.herokuapp.com/';
 
 
 class socket extends EventListenerClass {
@@ -72,7 +73,7 @@ class socket extends EventListenerClass {
     }
 
     sendRTCOverSocket = (to, type, message) =>  {
-        socket_instance.socket.emit("webrtc", JSON.stringify({id: user_instance.user.id, to: to, type: type, data: message}));
+        socket_instance.socket.emit("webrtc", {id: user_instance.user.id, to: to, type: type, data: message});
     }
 }
 

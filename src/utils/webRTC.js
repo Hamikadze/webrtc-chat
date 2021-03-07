@@ -2,7 +2,6 @@ import {socket_instance} from "./socket";
 import EventListenerClass from "./eventListenerClass";
 import {user_instance} from "../storage/user";
 
-
 class webRTC extends EventListenerClass {
     constructor() {
         super();
@@ -13,17 +12,17 @@ class webRTC extends EventListenerClass {
         this.server = {
             iceServers: [
                 {
-                    url: 'turn:217.150.77.131:3478',
-                    username: 'turnclient',
-                    credential: '$0mep@$$w0rd'
-                },
-                {url: 'stun:217.150.77.131:3478'},
-                {
                     url: 'turn:webrtc-chat-api.herokuapp.com:3478',
                     username: 'turnclient',
                     credential: '$0mep@$$w0rd'
                 },
                 {url: 'stun:webrtc-chat-api.herokuapp.com'},
+                {
+                    url: 'turn:217.150.77.131:3478',
+                    username: 'turnclient',
+                    credential: '$0mep@$$w0rd'
+                },
+                {url: 'stun:217.150.77.131:3478'},
                 {url: 'stun:stun.l.google.com:19302'},
                 {url: 'stun:stun.l.google.com:19302'},
                 {url: 'stun:stun1.l.google.com:19302'},
@@ -80,49 +79,48 @@ export const webRTC_instance = new webRTC();
 export async function webRTC_newPeer({user, data}) {
     if (user !== 'SERVER')
         return;
-
+    const {id, name, room} = data;
     console.log('Creating new peer', [user, data]);
-    createConnection(data.id);
-    const pc = webRTC_instance.peers[data.id].connection;
+    createConnection(id);
+    const pc = webRTC_instance.peers[id].connection;
 
-    await initMedia(data.id, pc);
+    initConnection(id,  pc);
+
+    await initMedia(id, pc);
     await pc.createOffer().then(offer => {
-        return pc.setLocalDescription(offer)
-            .catch(error => console.error('Error set local description', error));
+        return pc.setLocalDescription(offer).then(() => {
+            socket_instance.sendRTCOverSocket(id, "offer", offer);
+        }).catch(error => console.error('Error set local description', error));
     }).catch(error => console.error('Error create offer', error));
-    initConnection(data.id, "offer", pc);
+
+
 }
 
-export function socketReceived(data) {
-    const json = JSON.parse(data);
-    console.log('socketReceived:', json);
-    switch (json.type) {
+export function socketReceived({id, to, type, data}) {
+    //console.log({id, to, type, data});
+    switch (type) {
         case "candidate":
-            remoteCandidateReceived(json.id, json.data);
+            remoteCandidateReceived(id, data);
             break;
         case "offer":
-            remoteOfferReceived(json.id, json.data);
+            remoteOfferReceived(id, data);
             break;
         case "answer":
-            remoteAnswerReceived(json.id, json.data);
+            remoteAnswerReceived(id, data);
             break;
         default:
             console.log(`Unknown type received from socket:`);
-            console.log(json);
+            console.log({id, to, type, data});
             break;
     }
 }
 
 export async function remoteAnswerReceived(id, answer) {
-    console.log('Remote answer received', [id, answer]);
-
     const pc = webRTC_instance.peers[id].connection;
     await pc.setRemoteDescription(answer).catch(error => console.error('Error set remote description', error));
 }
 
 export async function remoteCandidateReceived(id, candidate) {
-    console.log('Remote offer received', [id, candidate])
-
     createConnection(id);
     const pc = webRTC_instance.peers[id].connection;
     await pc.addIceCandidate(candidate)
@@ -130,24 +128,29 @@ export async function remoteCandidateReceived(id, candidate) {
 }
 
 export async function remoteOfferReceived(id, offer) {
-    console.log('Remote offer received', [id, offer]);
-
     createConnection(id);
     const pc = webRTC_instance.peers[id].connection;
     await initMedia(id, pc);
+
+    initConnection(id, pc);
+
     await pc.setRemoteDescription(offer).then(() => {
         pc.createAnswer().then(answer => {
-            return pc.setLocalDescription(answer)
+            return pc.setLocalDescription(answer).then(() => {
+
+                socket_instance.sendRTCOverSocket(id, "answer", answer);
+            })
                 .catch(error => console.error('Error set local description', error));
         }).catch(error => console.error('Error create answer', error));
     }).catch(error => console.error('Error set remote description', error));
 
-    initConnection(id, "answer", pc);
+
 }
 
-function initConnection(id, sdpType, pc) {
+function initConnection(id, pc) {
     pc.onicecandidate = function (event) {
-        socket_instance.sendRTCOverSocket(id, "candidate", event.candidate);
+        if (event.candidate)
+            socket_instance.sendRTCOverSocket(id, "candidate", event.candidate);
     }
 
     pc.oniceconnectionstatechange = function (event) {
@@ -169,14 +172,14 @@ function initConnection(id, sdpType, pc) {
         }
     }
 
-    pc.onnegotiationneeded = async function (event) {
+    /*pc.onnegotiationneeded = async function (event) {
         if (pc.signalingState !== "stable") return;
         pc.createOffer().then(offer => {
             pc.setLocalDescription(offer).then(() => {
-                socket_instance.sendRTCOverSocket(id, sdpType, pc.localDescription);
+                socket_instance.sendRTCOverSocket(id, 'offer', pc.localDescription);
             }).catch(error => console.error('Error set local description', error));
         }).catch(error => console.error('Error create offer', error));
-    }
+    }*/
 }
 
 async function initMedia(id, pc) {

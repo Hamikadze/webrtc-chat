@@ -1,7 +1,7 @@
 .round-container{
 	margin: 0 10px;
-	height:  7vmin;
-	width: 7vmin;
+	height:  64px;
+	width: 64px;
 	overflow: hidden;
 	border-radius: 50%;
 	background-color: #ffffff;
@@ -27,8 +27,8 @@
 }
 
 .round-container > img{
-	height: 5vmin;
-	width: 5vmin;
+	height: 32px;
+	width: 32px;
 
 }
 
