@@ -1,8 +1,8 @@
 {
   "files": {
-    "main.css": "/webrtc-chat/static/css/main.f764d6a7.chunk.css",
-    "main.js": "/webrtc-chat/static/js/main.5bff9c84.chunk.js",
-    "main.js.map": "/webrtc-chat/static/js/main.5bff9c84.chunk.js.map",
+    "main.css": "/webrtc-chat/static/css/main.24346856.chunk.css",
+    "main.js": "/webrtc-chat/static/js/main.1e245753.chunk.js",
+    "main.js.map": "/webrtc-chat/static/js/main.1e245753.chunk.js.map",
     "runtime-main.js": "/webrtc-chat/static/js/runtime-main.a5c22f7a.js",
     "runtime-main.js.map": "/webrtc-chat/static/js/runtime-main.a5c22f7a.js.map",
     "static/js/2.0ba835bc.chunk.js": "/webrtc-chat/static/js/2.0ba835bc.chunk.js",
@@ -10,7 +10,7 @@
     "static/js/3.22abb8c9.chunk.js": "/webrtc-chat/static/js/3.22abb8c9.chunk.js",
     "static/js/3.22abb8c9.chunk.js.map": "/webrtc-chat/static/js/3.22abb8c9.chunk.js.map",
     "index.html": "/webrtc-chat/index.html",
-    "static/css/main.f764d6a7.chunk.css.map": "/webrtc-chat/static/css/main.f764d6a7.chunk.css.map",
+    "static/css/main.24346856.chunk.css.map": "/webrtc-chat/static/css/main.24346856.chunk.css.map",
     "static/js/2.0ba835bc.chunk.js.LICENSE.txt": "/webrtc-chat/static/js/2.0ba835bc.chunk.js.LICENSE.txt",
     "static/media/camera.53281603.svg": "/webrtc-chat/static/media/camera.53281603.svg",
     "static/media/microphone.b5ad8492.svg": "/webrtc-chat/static/media/microphone.b5ad8492.svg"
@@ -18,7 +18,7 @@
   "entrypoints": [
     "static/js/runtime-main.a5c22f7a.js",
     "static/js/2.0ba835bc.chunk.js",
-    "static/css/main.f764d6a7.chunk.css",
-    "static/js/main.5bff9c84.chunk.js"
+    "static/css/main.24346856.chunk.css",
+    "static/js/main.1e245753.chunk.js"
   ]
 }
