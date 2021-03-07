@@ -1,8 +1,8 @@
 import {io} from "socket.io-client";
-import {webRTC_newPeer, socketReceived} from "./webRTC";
 import {user_instance} from "../storage/user";
-import {chatHistory_instance} from "../components/chat/chatHistory/store";
+import {chat_instance} from "../storage/chat";
 import EventListenerClass from "./eventListenerClass";
+import {webRTC_instance} from "./webRTC";
 
 const ENDPOINT = (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') ?
     'http://localhost:4001' : 'https://webrtc-chat-api.herokuapp.com/';
@@ -23,8 +23,8 @@ class socket extends EventListenerClass {
         if (!this.socket.connected) {
             return;
         }
-        this.socket.on("webrtc", socketReceived);
-        this.socket.on("webrtc_new_peer", webRTC_newPeer);
+        this.socket.on("webrtc", webRTC_instance.socketReceived);
+        this.socket.on("webrtc_new_peer", webRTC_instance.webrtcNewPeer);
         this.socket.on("roomData", this.onRoomData);
         this.socket.on("message", this.onMessage);
         this.socket.on("logged", this.onLogged);
@@ -65,7 +65,7 @@ class socket extends EventListenerClass {
 
 
     onMessage = (data) =>  {
-        chatHistory_instance.push(data);
+        chat_instance.push(data);
     }
 
     sendNewMessage = (message) =>  {

@@ -37,10 +37,31 @@
 }
 
 .selected-video-container > video {
-	border-radius: 5px;
 	background-size: cover;
-	overflow: hidden;
+	border-radius: 5px;
 	object-fit: fill;
+	overflow: hidden;
+}
+
+@media (orientation: landscape) {
+	.selected-video-container > video {
+		height: 100%;
+		width: auto;
+	}
+
+	@media (aspect-ratio: 4 /3) {
+		.selected-video-container > video {
+			width: 100%;
+			height: auto;
+		}
+	}
+}
+
+@media (orientation: portrait) {
+	.selected-video-container > video {
+		height: auto;
+		width: 100%;
+	}
 }
 
 .stream-controls-container {

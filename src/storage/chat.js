@@ -1,6 +1,6 @@
-import EventListenerClass from "../../../utils/eventListenerClass";
+import EventListenerClass from "../utils/eventListenerClass";
 
-class store  extends EventListenerClass{
+class chat  extends EventListenerClass{
     constructor() {
         super();
         this._eventListeners = {};
@@ -20,4 +20,4 @@ class store  extends EventListenerClass{
     }
 }
 
-export const chatHistory_instance = new store();
+export const chat_instance = new chat();

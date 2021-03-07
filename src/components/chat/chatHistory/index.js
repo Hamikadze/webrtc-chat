@@ -1,14 +1,14 @@
 import React, {useEffect, useState} from 'react';
 import './style.css';
-import {chatHistory_instance} from "./store";
+import {chat_instance} from "../../../storage/chat";
 
 export default function ChatHistory() {
     const [messages, setMessages] = useState([]);
 
     useEffect(() => {
-        chatHistory_instance.addEventListener('newMessage', onMessage);
+        chat_instance.addEventListener('newMessage', onMessage);
         return () => {
-            chatHistory_instance.removeEventListener('newMessage', onMessage);
+            chat_instance.removeEventListener('newMessage', onMessage);
         };
     }, []);
     const onMessage = (event) => {
