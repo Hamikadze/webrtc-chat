@@ -5,6 +5,7 @@ import {socket_instance} from "../../utils/socket";
 export default function UserList() {
     const [usersList, setUsersList] = useState([]);
 
+    /* track getting new users list of users from socket */
     useEffect(() => {
         socket_instance.addEventListener('usersChange', onUsersChange);
         return () => {

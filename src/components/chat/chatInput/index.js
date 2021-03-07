@@ -7,17 +7,20 @@ export default function AutoTextArea() {
     const [text, setText] = useState("");
     const [textAreaHeight, setTextAreaHeight] = useState("auto");
 
+    /* Automatically increase text area height based on text height */
     useEffect(() => {
         setTextAreaHeight(`${textAreaRef.current.scrollHeight + 2}px`);
     }, [text]);
 
+
     const onChangeHandler = function (event) {
+        /* need to decrease text area height on text deleting */
         setTextAreaHeight("auto");
         setText(event.target.value);
-        console.log(text.split('\r\n'));
     };
 
     const onKeyDown = function (event) {
+        /* SHIFT + ENTER = new line, only ENTER send message */
         if (!event.shiftKey && event.keyCode === 13) {
             sendMessage();
             event.preventDefault();
@@ -28,8 +31,10 @@ export default function AutoTextArea() {
         const msg = text.trim();
         if (msg.length === 0)
             return;
+
         socket_instance.sendNewMessage(msg);
 
+        /* Sets default text area height */
         setText('');
         setTextAreaHeight("auto");
     }

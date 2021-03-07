@@ -8,6 +8,7 @@ export default function Login() {
     const [error, setError] = useState('');
     const [connected, setConnected] = useState('');
 
+    /* Track socket connection status and auth errors (duplicate/empty/unallowed logins) */
     useEffect(() => {
         socket_instance.addEventListener('error', onError);
         socket_instance.addEventListener('connectionChange', onConnectionChange);
@@ -18,7 +19,6 @@ export default function Login() {
     }, []);
 
     const onError = function (error) {
-        // eslint-disable-next-line default-case
         switch (error.type) {
             case 'addUser':
                 setError(error.error);
@@ -26,6 +26,7 @@ export default function Login() {
         }
     }
 
+    /* Track enter press to imitate button press */
     const onKeyDown = function (event){
         if (event.keyCode === 13) {
             handlerOnClick();
@@ -40,6 +41,7 @@ export default function Login() {
         setUsername(event.target.value);
     }
 
+    /* send username to socket to check and get {user ID, validated username, room ID}*/
     const handlerOnClick = function (value) {
         socket_instance.connect({user: username, room: user_instance.user.room});
     }

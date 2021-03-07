@@ -9,6 +9,7 @@ export default function VideoGrid() {
     const [usersList, setUsersList] = useState([]);
     const selectedVideo = useRef(null);
 
+    /* track getting new users list of users from socket for create video row*/
     useEffect(() => {
         socket_instance.addEventListener('usersChange', onUsersChange);
         return () => {
@@ -20,13 +21,13 @@ export default function VideoGrid() {
         setUsersList([...data]);
     }
 
+    /* set video and audio stream from clicked video to selected (big) video element */
     const handleClick = (event) => {
         selectedVideo.current.srcObject = document.getElementById(`video-${event.target.id.substr(6)}`).srcObject;
     }
 
     return <div className={'VideoGrid'}>
         <div className={"video-row-container"}>
-
             <VideoBox title={user_instance.user.name}
                       videoId={user_instance.user.id} onClick={handleClick}
                       type={'local'}/>
@@ -37,7 +38,6 @@ export default function VideoGrid() {
                               type={'remote'}/>
                 )
             }
-
         </div>
         <div className={'selected-video-container'}>
             <video ref={selectedVideo} autoPlay muted className="selected-video" id="selected-video"/>

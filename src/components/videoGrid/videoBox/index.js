@@ -4,12 +4,19 @@ import {media_instance} from "../../../storage/mediaStreams";
 
 export default function VideoBox({videoId, title, type, onClick}) {
     const videoEl = useRef(null);
+
+    /* tracks adding or changing video/audio stream from peer in stream array */
     useEffect(() => {
         media_instance.addEventListener(`streamAdded-${videoId}`, onStreamAdded);
         media_instance.addEventListener(`streamToggled-${videoId}`, onStreamToggled);
-        if (videoEl !== null) {
-            videoEl.current.srcObject = media_instance.getStream(videoId);
-            console.log([videoId, media_instance.getStream(videoId), media_instance._streams]);
+
+        const stream = media_instance.getStream(videoId);
+        /*
+        * if  video element exist and streams array contains tracks for current id
+        * adding it to video element
+        */
+        if (videoEl !== null && stream !== undefined) {
+            videoEl.current.srcObject = stream;
         }
         return () => {
             media_instance.removeEventListener(`streamAdded-${videoId}`, onStreamAdded);
@@ -27,6 +34,10 @@ export default function VideoBox({videoId, title, type, onClick}) {
             videoEl.current.srcObject = stream;
     }
 
+    /*
+    * Tracks click on video and then transfer clicked element to videoGrid
+    * for setting to selected video box (big view)
+    */
     const handleClick = function (event) {
         onClick(event);
     }

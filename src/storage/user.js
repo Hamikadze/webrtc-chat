@@ -2,16 +2,8 @@ import {uuid} from "../utils/uuid";
 
 class user {
     constructor() {
-        this._eventListeners = {};
+        /* construct user data and generate or parse room id from url params */
         this._user = {id: '', name: '', room: this.roomId};
-    }
-
-    get localStream() {
-        return this._localStream;
-    }
-
-    set localStream(value) {
-        this._localStream = value;
     }
 
     get user() {
@@ -23,6 +15,10 @@ class user {
         console.log('Logged', this._user);
     }
 
+    /*
+    * generate room id if url params is empty or parse room id from url params
+    * params should be ?room=[room_id]
+    */
     get roomId() {
         if (this._user === undefined || this._user.room === undefined) {
             const url = new URL(window.location.href);

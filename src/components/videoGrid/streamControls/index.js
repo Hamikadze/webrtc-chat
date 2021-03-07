@@ -5,13 +5,14 @@ import './style.css';
 import {media_instance} from "../../../storage/mediaStreams";
 
 export default function StreamControls() {
+    /* Vars to change style of video and mice icons */
     const [video, setVideo] = useState(media_instance.getState(media_instance.localId, 'video').enabled);
     const [audio, setAudio] = useState(media_instance.getState(media_instance.localId, 'audio').enabled);
 
+    /* Toggle track state for local id (tracks from local user media devices) */
     const toggleCamera = function () {
         setVideo(media_instance.toggleStream(media_instance.localId, 'video').enabled);
     }
-
     const toggleMic = function () {
         setAudio(media_instance.toggleStream(media_instance.localId, 'audio').enabled);
     }

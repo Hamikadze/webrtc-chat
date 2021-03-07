@@ -11,10 +11,12 @@ export default function ChatHistory() {
             chat_instance.removeEventListener('newMessage', onMessage);
         };
     }, []);
+
     const onMessage = (event) => {
         setMessages(v => [...v, event]);
     }
 
+    /* Convert time to 00:00 format */
     const formatTime = (time) => `${('0' + time.getHours()).substr(-2)}:${('0' + time.getMinutes()).substr(-2)}`
 
     return <div className={'ChatHistory'}>

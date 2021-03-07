@@ -5,7 +5,7 @@
 }
 
 .App {
-  background-color: #ece2e1;
+  background-color: #CAF0F7;
   height: 100vh;
   width: 100vw;
 }
@@ -72,6 +72,7 @@ button:active{
 }
 
 
+/* Set a style for all inputs */
 input[type=text] {
   box-shadow: 0px 5px 10px 2px rgba(34, 60, 80, 0.2);
   border: 1px solid #ccc;
@@ -81,6 +82,7 @@ input[type=text] {
   width: 100%;
 }
 
+/* Set a style for all text areas */
 textarea{
   box-shadow: 0px 5px 10px 2px rgba(34, 60, 80, 0.2);
   border: 1px solid #ccc;
@@ -90,6 +92,8 @@ textarea{
   width: 100%;
 }
 
+
+/* Set a style for scrolls */
 *::-webkit-scrollbar-track
 {
   -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
