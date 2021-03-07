@@ -33,7 +33,7 @@ class socket extends EventListenerClass {
         this.socket.on("error", this.onError);
 
         /* sending to socket server room join request */
-        this.socket.emit("join", JSON.stringify({username: user, room: room}));
+        this.socket.emit("join", {username: user, room: room});
     }
 
     /* when connected or disconnected from socket calls all methods to handle events */

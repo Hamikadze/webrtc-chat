@@ -8,6 +8,9 @@ This project uses:
 * Socket.io client
 * gh-pages
 
+webRTC chat is tested on Android and Chromium based browsers.\
+webRTC chat not tested on Apple devices (Safari browser) due to lack of them.
+
 ## Api server
 
 Api server can be found at: [webRTC chat api](https://github.com/Hamikadze/webrtc-chat-api)
