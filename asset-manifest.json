@@ -1,24 +1,24 @@
 {
   "files": {
-    "main.css": "/webrtc-chat/static/css/main.a26b1497.chunk.css",
-    "main.js": "/webrtc-chat/static/js/main.a5589d00.chunk.js",
-    "main.js.map": "/webrtc-chat/static/js/main.a5589d00.chunk.js.map",
-    "runtime-main.js": "/webrtc-chat/static/js/runtime-main.a5c22f7a.js",
-    "runtime-main.js.map": "/webrtc-chat/static/js/runtime-main.a5c22f7a.js.map",
-    "static/js/2.f54e6e94.chunk.js": "/webrtc-chat/static/js/2.f54e6e94.chunk.js",
-    "static/js/2.f54e6e94.chunk.js.map": "/webrtc-chat/static/js/2.f54e6e94.chunk.js.map",
-    "static/js/3.22abb8c9.chunk.js": "/webrtc-chat/static/js/3.22abb8c9.chunk.js",
-    "static/js/3.22abb8c9.chunk.js.map": "/webrtc-chat/static/js/3.22abb8c9.chunk.js.map",
+    "main.css": "/webrtc-chat/static/css/main.e4975e4c.chunk.css",
+    "main.js": "/webrtc-chat/static/js/main.0a3625b8.chunk.js",
+    "main.js.map": "/webrtc-chat/static/js/main.0a3625b8.chunk.js.map",
+    "runtime-main.js": "/webrtc-chat/static/js/runtime-main.c8dbd788.js",
+    "runtime-main.js.map": "/webrtc-chat/static/js/runtime-main.c8dbd788.js.map",
+    "static/js/2.94b8fb48.chunk.js": "/webrtc-chat/static/js/2.94b8fb48.chunk.js",
+    "static/js/2.94b8fb48.chunk.js.map": "/webrtc-chat/static/js/2.94b8fb48.chunk.js.map",
+    "static/js/3.f4e81f24.chunk.js": "/webrtc-chat/static/js/3.f4e81f24.chunk.js",
+    "static/js/3.f4e81f24.chunk.js.map": "/webrtc-chat/static/js/3.f4e81f24.chunk.js.map",
     "index.html": "/webrtc-chat/index.html",
-    "static/css/main.a26b1497.chunk.css.map": "/webrtc-chat/static/css/main.a26b1497.chunk.css.map",
-    "static/js/2.f54e6e94.chunk.js.LICENSE.txt": "/webrtc-chat/static/js/2.f54e6e94.chunk.js.LICENSE.txt",
+    "static/css/main.e4975e4c.chunk.css.map": "/webrtc-chat/static/css/main.e4975e4c.chunk.css.map",
+    "static/js/2.94b8fb48.chunk.js.LICENSE.txt": "/webrtc-chat/static/js/2.94b8fb48.chunk.js.LICENSE.txt",
     "static/media/camera.53281603.svg": "/webrtc-chat/static/media/camera.53281603.svg",
     "static/media/microphone.b5ad8492.svg": "/webrtc-chat/static/media/microphone.b5ad8492.svg"
   },
   "entrypoints": [
-    "static/js/runtime-main.a5c22f7a.js",
-    "static/js/2.f54e6e94.chunk.js",
-    "static/css/main.a26b1497.chunk.css",
-    "static/js/main.a5589d00.chunk.js"
+    "static/js/runtime-main.c8dbd788.js",
+    "static/js/2.94b8fb48.chunk.js",
+    "static/css/main.e4975e4c.chunk.css",
+    "static/js/main.0a3625b8.chunk.js"
   ]
 }
