@@ -59,6 +59,7 @@ class socket extends EventListenerClass {
 
     /* when new user connected or disconnected to socket calls all methods to handle events */
     onRoomData = (data) =>  {
+        user_instance.users = data.users;
         this._eventListeners['usersChange']?.forEach(i => {
             i(data.users);
         });
@@ -83,6 +84,7 @@ class socket extends EventListenerClass {
     * send new message to socket,
     * contains info to establish connections between peers via webRTC
     * like offer, answer, candidate (iceCandidate)
+    * or send to other users in room request to create a new RTC connection
     */
     sendRTCOverSocket = (to, type, message) =>  {
         socket_instance.socket.emit("webrtc", {id: user_instance.user.id, to: to, type: type, data: message});

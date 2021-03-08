@@ -1,28 +1,24 @@
 import {useEffect, useState} from "react";
 import {webRTC_instance} from "./utils/webRTC";
-import Login from './components/login'
+import LoginScreen from './components/loginScreen'
 import {socket_instance} from "./utils/socket";
-import UserList from "./components/usersList";
-import VideoGrid from "./components/videoGrid";
-import Chat from "./components/chat";
 import {user_instance} from "./storage/user";
-import {media_instance} from "./storage/mediaStreams";
 import './App.css';
+import MainScreen from "./components/mainScreen";
 
 function App() {
     const [logged, setLogged] = useState(false)
 
-    /* Tracks logged status
+    /*
+    * Handle login status
     * sets user data from server to local storage {name, id, room}
-    * sets local id to media instance (store local and peers streams/tracks)
     */
     const onLogged = (data) => {
         user_instance.user = data.data;
-        media_instance.localId = data.data.id;
         setLogged(true);
     }
 
-    /* Subscribe to login event and add before unload for socket and RTC connections*/
+    /* Subscribe to loginScreen event and add before unload for socket and RTC connections*/
     useEffect(() => {
         socket_instance.addEventListener('logged', onLogged);
         if (!logged)
@@ -36,19 +32,8 @@ function App() {
         };
     }, [logged]);
 
-    return <div className="App"> {logged ? <>
-        <>
-            <div className='App-body'>
-                <div className={'video-grid-container'}>
-                    <VideoGrid/>
-                </div>
-                <div className={'info-chat-container'}>
-                    <UserList/>
-                    <Chat/>
-                </div>
-            </div>
-        </>
-    </> : <Login/>}
+    return <div className="App">
+        {logged ? <MainScreen/> : <LoginScreen/>}
     </div>;
 }
 

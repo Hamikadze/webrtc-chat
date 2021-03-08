@@ -11,6 +11,7 @@ export default function VideoGrid() {
 
     /* track getting new users list of users from socket for create video row*/
     useEffect(() => {
+        onUsersChange(user_instance.users);
         socket_instance.addEventListener('usersChange', onUsersChange);
         return () => {
             socket_instance.removeEventListener('usersChange', onUsersChange);

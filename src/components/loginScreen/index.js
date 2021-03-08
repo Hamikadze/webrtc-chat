@@ -1,9 +1,9 @@
 import React, {useEffect, useState} from 'react';
-import './style.css';
 import {socket_instance} from "../../utils/socket";
 import {user_instance} from "../../storage/user";
+import './style.css';
 
-export default function Login() {
+export default function LoginScreen() {
     const [username, setUsername] = useState('');
     const [error, setError] = useState('');
     const [connected, setConnected] = useState('');
@@ -18,6 +18,7 @@ export default function Login() {
         };
     }, []);
 
+    /* handle error with 'addUser' type from server and show it to user */
     const onError = function (error) {
         switch (error.type) {
             case 'addUser':

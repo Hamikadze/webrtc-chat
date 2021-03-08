@@ -8,7 +8,7 @@ class webRTC extends EventListenerClass {
         this._connectionsCount = 0;
 
         /* remote peers array (contains peerConnections) */
-        this.peers = {};
+        this._peers = {};
 
         /* servers for NAT bypassing */
         this.server = {
@@ -38,7 +38,6 @@ class webRTC extends EventListenerClass {
     /* Return connection count */
     get connectionsCount() {
         return this._connectionsCount;
-
     }
 
     /* Sets connection count and calls all methods to handle events */
@@ -47,18 +46,18 @@ class webRTC extends EventListenerClass {
         this._eventListeners['connectionsChange']?.forEach(i => {
             i({
                 count: this._connectionsCount,
-                peers: this.peers
+                peers: this._peers
             })
         });
     }
 
     /* before unloaded closes channels of all peers */
     onBeforeUnload = () => {
-        for (let id in this.peers) {
-            if (this.peers.hasOwnProperty(id)) {
-                if (this.peers[id].channel !== undefined) {
+        for (let id in this._peers) {
+            if (this._peers.hasOwnProperty(id)) {
+                if (this._peers[id].channel !== undefined) {
                     try {
-                        this.peers[id].channel.close();
+                        this._peers[id].channel.close();
                     } catch (e) {
                         console.error(e);
                     }
@@ -67,44 +66,14 @@ class webRTC extends EventListenerClass {
         }
     }
 
-    /* Called for the caller to create a new connection */
-    webrtcNewPeer = async ({user, data}) => {
-        /* Messages from socket about webRTC must be from SERVER (forwarding) */
-        if (user !== 'SERVER')
-            return;
-        const {id, name, room} = data;
-
-        /* Creating new peer connection and adding it to the peers connection array */
-        this.createConnection(id);
-        const pc = this.peers[id].connection;
-
-        /* Generated candidates by the onicecandidate-handler */
-        this.initConnection(id, pc);
-
-        /*
-        * Register track handlers
-        * Add MediaStreamTracks to the connections
-        */
-        await this.initMedia(id, pc);
-
-        /*
-        * Generates an offer by calling createOffer()
-        * Sets the generated offer as local description
-        * Sends the generated offer over the signalling channel to peer
-        */
-        await pc.createOffer().then(offer => {
-            return pc.setLocalDescription(offer).then(() => {
-                socket_instance.sendRTCOverSocket(id, "offer", offer);
-            }).catch(error => console.error('Error set local description', error));
-        }).catch(error => console.error('Error create offer', error));
-
-
-    }
 
     /* Processing incoming messages from the socket about webRTC connection */
     socketReceived = ({id, to, type, data}) => {
         //console.log({id, to, type, data});
         switch (type) {
+            case "newPeerReceived":
+                this.newPeerReceived(id);
+                break;
             case "candidate":
                 this.remoteCandidateReceived(id, data);
                 break;
@@ -121,16 +90,44 @@ class webRTC extends EventListenerClass {
         }
     }
 
+    /* Called for the caller to create a new connection */
+    newPeerReceived = async (id) => {
+        /* Creating new peer connection and adding it to the peers connection array */
+        this.createConnection(id);
+        const pc = this._peers[id].connection;
+        const tracks = this._peers[id].tracks;
+
+        /* Generated candidates by the onicecandidate-handler */
+        this.initConnection(id, pc);
+
+        /*
+        * Register track handlers
+        * Add MediaStreamTracks to the connections
+        */
+        await this.initMedia(id, tracks, pc);
+
+        /*
+        * Generates an offer by calling createOffer()
+        * Sets the generated offer as local description
+        * Sends the generated offer over the signalling channel to peer
+        */
+        await pc.createOffer().then(offer => {
+            return pc.setLocalDescription(offer).then(() => {
+                socket_instance.sendRTCOverSocket(id, "offer", offer);
+            }).catch(error => console.error('Error set local description', error));
+        }).catch(error => console.error('Error create offer', error));
+    }
+
     /* Receives the answer from remote peer and set remote description */
     remoteAnswerReceived = async (id, answer) => {
-        const pc = this.peers[id].connection;
+        const pc = this._peers[id].connection;
         await pc.setRemoteDescription(answer).catch(error => console.error('Error set remote description', error));
     }
 
     /* Receives ice candidates the remote peer */
     remoteCandidateReceived = async (id, candidate) => {
         this.createConnection(id);
-        const pc = this.peers[id].connection;
+        const pc = this._peers[id].connection;
         await pc.addIceCandidate(candidate)
             .catch(error => console.error('Error add iceCandidate', error));
     }
@@ -140,13 +137,14 @@ class webRTC extends EventListenerClass {
     remoteOfferReceived = async (id, offer) => {
         /* Creating new peer connection and adding it to the peers connection array */
         this.createConnection(id);
-        const pc = this.peers[id].connection;
+        const pc = this._peers[id].connection;
+        const tracks = this._peers[id].tracks;
 
         /*
         * Register track handlers
         * Add MediaStreamTracks to the connections
         */
-        await this.initMedia(id, pc);
+        await this.initMedia(id, tracks, pc);
 
         /* Generated candidates by the onicecandidate-handler */
         this.initConnection(id, pc);
@@ -182,7 +180,7 @@ class webRTC extends EventListenerClass {
                 * removes tracks by peer id from media streams
                 */
                 case 'disconnected': {
-                    delete this.peers[id];
+                    delete this._peers[id];
                     media_instance.removeStream(id);
                     this.connectionsCount = this.connectionsCount - 1;
                     console.log(`[${id}] disconnected. Peers: ${this.connectionsCount}`);
@@ -194,6 +192,7 @@ class webRTC extends EventListenerClass {
                     console.log(`[${id}] connected. Peers: ${this.connectionsCount}`);
                     break;
                 }
+
                 default:
                     console.log(pc.iceConnectionState);
                     break;
@@ -218,14 +217,19 @@ class webRTC extends EventListenerClass {
     * If the user has allowed access to the microphone and camera
     * adds tracks to the connection tracks
     */
-    initMedia = async (id, pc) => {
+    initMedia = async (id, tracks, pc) => {
         pc.ontrack = function ({streams: [stream]}) {
+            console.log([id, stream]);
             media_instance.addStream(id, stream);
         }
 
         if (media_instance.localStream !== undefined)
             media_instance.localStream.getTracks().forEach(track => {
-                pc.addTrack(track, media_instance.localStream);
+                console.log('Adding new track', [pc, track]);
+                if (!tracks.includes(track)) {
+                    tracks.push(track);
+                    pc.addTrack(track, media_instance.localStream);
+                }
             })
     }
 
@@ -234,10 +238,12 @@ class webRTC extends EventListenerClass {
     * connection individual for each peer
     */
     createConnection = (id) => {
-        if (this.peers[id] === undefined) {
-            this.peers[id] = {};
-            this.peers[id].connection =
+        if (this._peers[id] === undefined) {
+            this._peers[id] = {};
+            this._peers[id].tracks = [];
+            this._peers[id].connection =
                 new RTCPeerConnection(this.server);
+            console.log(this._peers[id]);
         }
     }
 }

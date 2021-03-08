@@ -1,0 +1,21 @@
+.MainScreen{
+	display: flex;
+	flex-direction: row;
+	height: 100%;
+	width: 100%;
+}
+
+.info-chat-container{
+	max-height: 100%;
+	width: 100px;
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+}
+
+.video-grid-container{
+	position: relative;
+	max-height: 100%;
+	width: 200px;
+	flex-grow: 2;
+}

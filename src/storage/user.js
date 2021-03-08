@@ -3,6 +3,7 @@ import {uuid} from "../utils/uuid";
 class user {
     constructor() {
         /* construct user data and generate or parse room id from url params */
+        this._users = [];
         this._user = {id: '', name: '', room: this.roomId};
     }
 
@@ -13,6 +14,14 @@ class user {
     set user(value) {
         this._user = value;
         console.log('Logged', this._user);
+    }
+
+    get users() {
+        return this._users;
+    }
+
+    set users(value) {
+        this._users = value;
     }
 
     /*

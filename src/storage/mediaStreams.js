@@ -3,13 +3,12 @@ import EventListenerClass from "../utils/eventListenerClass";
 class mediaStreams extends EventListenerClass {
     constructor() {
         super();
+        this._hasAccess = false;
         this._id = null;
         /* local media stream from user */
         this._localStream = undefined;
         /* Setting local media stream from user media device */
-        this.getUserMedia().then(stream => {
-            this._localStream = stream;
-        }).catch(error => console.error('Error get user media', error));
+        this.setLocalStream();
         /* all streams from users in room include localStream (stream with local user.id) */
         this._streams = {};
     }
@@ -28,9 +27,19 @@ class mediaStreams extends EventListenerClass {
         return this._localStream;
     }
 
+    get hasAccess(){
+        return this._hasAccess;
+    }
+
     /* return user media device with audio and video track */
-    getUserMedia() {
-        return navigator.mediaDevices.getUserMedia({video: true, audio: true});
+    setLocalStream() {
+        return navigator.mediaDevices.getUserMedia({video: true, audio: true}).then(stream => {
+            this._localStream = stream;
+            this._hasAccess = true;
+        }).catch(error => {
+            console.error('Error get user media', error)
+            this._hasAccess = false;
+        });
     }
 
     /*
@@ -47,6 +56,7 @@ class mediaStreams extends EventListenerClass {
         if (this._id === id) {
             this._localStream = this._streams[id];
         }
+        console.log(this._streams);
     }
 
     /*
@@ -56,7 +66,7 @@ class mediaStreams extends EventListenerClass {
     getTrack(id, type) {
         let track;
         if (this._streams[id] === undefined) {
-            console.warn('Stream doesn\'t exist', id)
+            console.warn('Stream doesn\'t exist', id);
             return undefined;
         }
         switch (type) {
