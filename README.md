@@ -1,12 +1,12 @@
 # About webRTC chat
 
-This is a simple JavaScript application – video, audio and text chat room:
-• After opening a page, user should enter his name
-• After entering the name user should join new chat room
-• User can copy link to the room and send to another user to invite him
-• User can send text messages to the chat and all users in the chat will see message
-• Users can see who sent message to the chat and when
-• Users can see who is in the chat room right now
+This is a simple JavaScript application – video, audio and text chat room:\
+* After opening a page, user should enter his name
+* After entering the name user should join new chat room
+* User can copy link to the room and send to another user to invite him
+* User can send text messages to the chat and all users in the chat will see message
+* Users can see who sent message to the chat and when
+* Users can see who is in the chat room right now
 
 # Getting Started
 
